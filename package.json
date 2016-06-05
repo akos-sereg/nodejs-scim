@@ -1,0 +1,29 @@
+{
+  "name": "nodejs-scim",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "description": "nodejs based demo app that implements SCIM REST API",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akos-sereg/nodejs-scim.git"
+  },
+  "keywords": [
+    "SCIM",
+    "nodejs",
+    "express",
+    "REST"
+  ],
+  "author": "Akos Sereg",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/akos-sereg/nodejs-scim/issues"
+  },
+  "dependencies": {
+    "express": ">= 1.2.0",
+    "http": ">= 0.0.0",
+    "body-parser": ">= 1.15.1"
+  }
+}
