@@ -5,15 +5,19 @@ module.exports = {
 		// Get Users
 		app.get('/svc/scim/users', function(req, resp) {
 
-		    console.log('[SCIM] GetUser');
+		    console.log('[SCIM] List Users');
 		    logger.dumpRequest(req);
 
-		    if (domain.getUsers().length > 0) {
+		    var startIndex = req.query.startIndex ? req.query.startIndex : 1;
+
+		    var users = domain.getUsers(startIndex);
+
+		    if (users.length > 0) {
 
 				var responseData = { 
-					totalResults: domain.getUsers().length, 
-					itemsPerPage: domain.getUsers().length, 
-					startIndex: 1, 
+					totalResults: users.length, 
+					itemsPerPage: users.length, 
+					startIndex: startIndex, 
 					schemas: [ 'urn:scim:schemas:core:1.0' ] 
 				};
 
@@ -21,10 +25,10 @@ module.exports = {
 				resp.send(responseData);
 		    }
 		    else {
-				resp.send({ 
+				resp.status(404).send({ 
 					totalResults: 0, 
-					itemsPerPage: 10, 
-					startIndex: 1, 
+					itemsPerPage: 0, 
+					startIndex: startIndex, 
 					schemas: [ 'urn:scim:schemas:core:1.0' ], 
 					Resources: [] 
 				});
@@ -69,6 +73,14 @@ module.exports = {
 
 		    resp.status(404).send();
 		});
+
+		app.delete('/svc/scim/users/:id', function(req, resp) {
+			console.log('[SCIM] Delete user by ID');
+			logger.dumpRequest(req);
+
+			domain.deleteUserById(req.params.id);
+			resp.send();
+		});
     },
 
     initGroupEndpoints: function(app, domain, logger) {
@@ -78,13 +90,15 @@ module.exports = {
 
 		    console.log('[SCIM] Get Groups');
 		    logger.dumpRequest(req);
-
+ 			
+		    var startIndex = req.query.startIndex ? req.query.startIndex : 1;
+		    var groups = domain.getGroups(startIndex);
 		    resp.send({ 
-				totalResults: domain.getGroups().length,
-				itemsPerPage: domain.getGroups().length,
-				startIndex: 1,
+				totalResults: groups.length,
+				itemsPerPage: groups.length,
+				startIndex: startIndex,
 				schemas: [ 'urn:scim:schemas:core:1.0' ],
-				Resources: domain.getGroups()
+				Resources: groups
 		    });
 		});
 

@@ -5,12 +5,43 @@ module.exports = {
 	newUserId: 1,
 	newGroupId: 1,
 
-	getUsers: function() {
-		return this.users;
+	getUsers: function(startIndex) {
+
+		if (!startIndex) {
+			return this.users;
+		}
+
+		if (startIndex > this.users.length) {
+			return [];
+		}
+
+		var result = [];
+	
+		for (var i=startIndex-1; i!=this.users.length; i++) {
+			result.push(this.users[i]);
+		}
+
+		return result;
 	},
 
-	getGroups: function() {
-		return this.groups;
+	getGroups: function(startIndex) {
+
+		if (!startIndex) {
+			return this.groups;
+		}
+
+		if (startIndex > this.groups.length) {
+			return [];
+		}
+
+		var result = [];
+
+
+		for (var i=startIndex-1; i!=this.groups.length; i++) {
+			result.push(this.groups[i]);
+		}
+
+		return result;
 	},
 
 	addUser: function(user) {
@@ -26,9 +57,42 @@ module.exports = {
 	updateUser: function(userId, userData) {
 		for (var i=0; i!=this.users.length; i++) {
 			if (this.users[i].id == userId) {
+			    if(!userData.id) {
+					userData.id = userId;
+			    }
+			    
 			    this.users[i] = userData;
 			}
 	    }
+	},
+
+	deleteUserById: function(userId) {
+
+		// Check if user is member of a group
+		var groupIds = [];
+		for (var i=0; i!=this.groups.length; i++) {
+			for (var j=0; j!=this.groups[i].members.length; j++) {
+				if (this.groups[i].members[j].value == userId) {
+					groupIds.push(this.groups[i].id);	
+				}
+			}
+		}	
+
+		for (var i=0; i!=groupIds.length; i++) {
+			console.log('\t[domain] Removing user from Group: ' + groupIds[i]);
+			this.removeUserFromGroup(groupIds[i], userId);
+		}
+
+		// Remove user from users
+		var users = [];
+		for (var i=0; i!=this.users.length; i++) {
+			if (this.users[i].id != userId) {
+				users.push(this.users[i]);
+			}
+		}
+
+		this.users = users;
+
 	},
 
 	removeUserFromGroup: function(groupId, userId) {
