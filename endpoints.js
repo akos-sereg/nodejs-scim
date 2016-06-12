@@ -16,8 +16,7 @@ module.exports = {
 		    console.log('[SCIM] List Users');
 		    logger.dumpRequest(req);
 
-		    if (!self.authorizeRequest(req)) {
-		    	resp.status(403).send();
+		    if (!self.authorizeRequest(req, resp)) {
 		    	return;
 		    }
 
@@ -55,7 +54,6 @@ module.exports = {
 		    logger.dumpRequest(req);
 
 		    if (!self.authorizeRequest(req)) {
-		    	resp.status(403).send();
 		    	return;
 		    }
 
@@ -73,7 +71,6 @@ module.exports = {
 		    logger.dumpRequest(req);
 
 		    if (!self.authorizeRequest(req)) {
-		    	resp.status(403).send();
 		    	return;
 		    }
 
@@ -89,7 +86,6 @@ module.exports = {
 		    logger.dumpRequest(req);
 
 		    if (!self.authorizeRequest(req)) {
-		    	resp.status(403).send();
 		    	return;
 		    }
 
@@ -107,7 +103,6 @@ module.exports = {
 			logger.dumpRequest(req);
 
 			if (!self.authorizeRequest(req)) {
-		    	resp.status(403).send();
 		    	return;
 		    }
 
@@ -127,7 +122,6 @@ module.exports = {
 		    logger.dumpRequest(req);
 
 		    if (!self.authorizeRequest(req)) {
-		    	resp.status(403).send();
 		    	return;
 		    }
  			
@@ -150,7 +144,6 @@ module.exports = {
 		    logger.dumpRequest(req);
 
 		    if (!self.authorizeRequest(req)) {
-		    	resp.status(403).send();
 		    	return;
 		    }
 
@@ -167,7 +160,6 @@ module.exports = {
 		    logger.dumpRequest(req);
 
 		    if (!self.authorizeRequest(req)) {
-		    	resp.status(403).send();
 		    	return;
 		    }
 
@@ -199,7 +191,7 @@ module.exports = {
 		});
     },
 
-    authorizeRequest: function(request) {
+    authorizeRequest: function(request, response) {
 
     	if (this.authorizationBearerToken == null) {
     		// Ignore authorization
@@ -208,10 +200,17 @@ module.exports = {
 
     	if (request.headers['authorization'] == undefined) {
     		// Authorization token was expected but not sent by client
+    		response.status(403).send();
     		return false;
     	}
 
     	var bearerToken = 'Bearer ' + this.authorizationBearerToken;
-    	return request.headers['authorization'] === bearerToken;
+    	var result = request.headers['authorization'] === bearerToken;
+
+    	if (!result) {
+			response.status(403).send();
+    	}
+
+    	return result;
     }
 }
