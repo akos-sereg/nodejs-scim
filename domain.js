@@ -60,7 +60,7 @@ module.exports = {
 			    if(!userData.id) {
 					userData.id = userId;
 			    }
-			    
+
 			    this.users[i] = userData;
 			}
 	    }
@@ -71,9 +71,11 @@ module.exports = {
 		// Check if user is member of a group
 		var groupIds = [];
 		for (var i=0; i!=this.groups.length; i++) {
-			for (var j=0; j!=this.groups[i].members.length; j++) {
-				if (this.groups[i].members[j].value == userId) {
-					groupIds.push(this.groups[i].id);	
+			if (this.groups[i].members != undefined) {
+				for (var j=0; j!=this.groups[i].members.length; j++) {
+					if (this.groups[i].members[j].value == userId) {
+						groupIds.push(this.groups[i].id);	
+					}
 				}
 			}
 		}	
@@ -116,6 +118,10 @@ module.exports = {
 	    var user = this.getUserById(userId);
 	    var group = this.getGroupById(groupId);
 
+	    if (group.members == undefined) {
+	    	group.members = [];
+	    }
+
 	    group.members.push({ 
 			value: user.id, 
 			display: user.userName 
@@ -148,6 +154,10 @@ module.exports = {
 	    
 	    if (group == null) {
 			throw new Error('Group not found');
+	    }
+
+	    if (group.members == undefined) {
+	    	group.members = [];
 	    }
 
 	    for (var i=0; i!= members.length; i++) {

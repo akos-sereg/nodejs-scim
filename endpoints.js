@@ -118,7 +118,7 @@ module.exports = {
 		// Update Group: Add Member
 		app.patch('/svc/scim/groups/:id', function(req, resp) {
 
-		    console.log('[SCIM] Update Group');
+			console.log('[SCIM] Update Group');
 		    logger.dumpRequest(req);
 
 		    var members = req.body.members;
