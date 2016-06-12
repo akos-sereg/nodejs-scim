@@ -54,6 +54,18 @@ module.exports = {
 		this.groups.push(group);
 	},
 
+	deleteGroup: function(groupId) {
+
+		var groups = [];
+		for (var i=0; i!=this.groups.length; i++) {
+			if (this.groups[i].id != groupId) {
+				groups.push(this.groups[i]);
+			}
+		}
+		
+		this.groups = groups;
+	},
+
 	updateUser: function(userId, userData) {
 		for (var i=0; i!=this.users.length; i++) {
 			if (this.users[i].id == userId) {

@@ -179,6 +179,30 @@ module.exports = {
 		    resp.send();
 
 		});
+
+		// Delete Group
+		app.delete('/svc/scim/groups/:id', function(req, resp) {
+			
+			console.log('[SCIM] Update Group');
+		    logger.dumpRequest(req);
+
+		    if (!self.authorizeRequest(req)) {
+		    	return;
+		    }
+
+		    try {
+				domain.deleteGroup(req.params.id);
+		    }
+		    catch(error) {
+		    	resp.status(400).send({ 
+				    Errors: { 
+						description: error.message, 
+						code: 400 } 
+				});
+		    }
+		    
+		    resp.send();
+		});
     },
 
     catchAll: function(app, logger) {

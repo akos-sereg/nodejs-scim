@@ -199,4 +199,23 @@ frisby.create('Ensure create group returns 201 Created')
     .toss();
 
   })
-.toss()
+.toss();
+
+/* ***************************************************** */
+/* Authorization                                         */
+/* ***************************************************** */
+
+if (authorizationBearer != null) {
+  
+  // Authorization token is defined, so we expect that server expects it - let's see whether we get 403 Forbidden if it's not provided or not
+  frisby.create('Get all users')
+    .get(scimServerEndpoint + '/users')
+    .addHeader('Authorization', 'Bearer invalidtoken')
+    .expectStatus(403)
+  .toss();
+
+  frisby.create('Get all users')
+    .get(scimServerEndpoint + '/users')
+    .expectStatus(403)
+  .toss();
+}
