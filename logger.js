@@ -10,7 +10,7 @@ module.exports = {
 		    console.log('  Authorization:\t' + request.headers['authorization']);
 		    console.log('  Remote Address:\t' + ip);
 		    console.log('  Query Parameters:\t' + (request.query != undefined ? JSON.stringify(request.query) : ''));
-		    console.log('  Body:\t' + (request.body != undefined ? JSON.stringify(request.body) : ''));
+		    console.log('  Request Payload:\t' + (request.body != undefined ? JSON.stringify(request.body) : ''));
 
 		    next();
 	    }

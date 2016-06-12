@@ -194,7 +194,18 @@ frisby.create('Ensure create group returns 201 Created')
         .toss();
       })
     .toss();
+  })
+.toss();
 
+frisby.create('Ensure create group returns 201 Created')
+  .post(serverConfig.serverAddress + '/groups', requestTemplates.getCreateGroupRequest(), { json: true })
+  .addHeader('Authorization', 'Bearer ' + serverConfig.authorizationBearer)
+  .after(function(err, res, body) {
+    frisby.create('Second group creation should fail, because group exists with the same name')
+      .post(serverConfig.serverAddress + '/groups', requestTemplates.getCreateGroupRequest(), { json: true })
+      .addHeader('Authorization', 'Bearer ' + serverConfig.authorizationBearer)
+      .expectStatus(400)
+    .toss();
   })
 .toss();
 

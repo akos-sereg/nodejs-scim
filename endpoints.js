@@ -85,10 +85,18 @@ module.exports = {
 		});
 
 		// Create Group
-		// TODO: Consider group name collision (400 Bad Request)
 		app.post('/svc/scim/groups', function(req, resp) {
 
 		    var group = req.body;
+
+		    var groups = domain.getGroups();
+		    for (var i=0; i!=groups.length; i++) {
+		    	if (groups[i].displayName == group.displayName) {
+					resp.status(400).send();		    		
+					return;
+		    	}
+		    }
+
 		    domain.addGroup(group);
 
 		    resp.status(201).send(group);
