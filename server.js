@@ -15,6 +15,7 @@ app.use(bodyParser.json());
 endpoints.initUserEndpoints(app, domain, logger);
 endpoints.initGroupEndpoints(app, domain, logger);
 endpoints.catchAll(app, logger);
+endpoints.setAuthorizationBearer('alma');
 
 http.createServer(app).listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));

@@ -1,12 +1,25 @@
 module.exports = {
 
+	authorizationBearerToken: null,
+
+	setAuthorizationBearer: function(bearer) {
+		this.authorizationBearerToken = bearer;
+	},
+
     initUserEndpoints: function(app, domain, logger) {
+
+    	var self = this;
 
 		// Get Users
 		app.get('/svc/scim/users', function(req, resp) {
 
 		    console.log('[SCIM] List Users');
 		    logger.dumpRequest(req);
+
+		    if (!self.authorizeRequest(req)) {
+		    	resp.status(403).send();
+		    	return;
+		    }
 
 		    var startIndex = req.query.startIndex ? req.query.startIndex : 1;
 
@@ -41,6 +54,11 @@ module.exports = {
 		    console.log('[SCIM] CreateUser');
 		    logger.dumpRequest(req);
 
+		    if (!self.authorizeRequest(req)) {
+		    	resp.status(403).send();
+		    	return;
+		    }
+
 		    var user = req.body;
 		    domain.addUser(user);
 
@@ -54,6 +72,11 @@ module.exports = {
 		    console.log('[SCIM] Update User');
 		    logger.dumpRequest(req);
 
+		    if (!self.authorizeRequest(req)) {
+		    	resp.status(403).send();
+		    	return;
+		    }
+
 		    domain.updateUser(req.params.id, req.body);
 
 		    resp.send(req.body);
@@ -64,6 +87,11 @@ module.exports = {
 
 		    console.log('[SCIM] Get user by ID');
 		    logger.dumpRequest(req);
+
+		    if (!self.authorizeRequest(req)) {
+		    	resp.status(403).send();
+		    	return;
+		    }
 
 		    var user = domain.getUserById(req.params.id);
 		    if(user != null) {
@@ -78,6 +106,11 @@ module.exports = {
 			console.log('[SCIM] Delete user by ID');
 			logger.dumpRequest(req);
 
+			if (!self.authorizeRequest(req)) {
+		    	resp.status(403).send();
+		    	return;
+		    }
+
 			domain.deleteUserById(req.params.id);
 			resp.send();
 		});
@@ -85,11 +118,18 @@ module.exports = {
 
     initGroupEndpoints: function(app, domain, logger) {
 
+    	var self = this;
+
 		// Get groups
 		app.get('/svc/scim/groups', function(req, resp) {
 
 		    console.log('[SCIM] Get Groups');
 		    logger.dumpRequest(req);
+
+		    if (!self.authorizeRequest(req)) {
+		    	resp.status(403).send();
+		    	return;
+		    }
  			
 		    var startIndex = req.query.startIndex ? req.query.startIndex : 1;
 		    var groups = domain.getGroups(startIndex);
@@ -109,6 +149,11 @@ module.exports = {
 		    console.log('[SCIM] Create Group');
 		    logger.dumpRequest(req);
 
+		    if (!self.authorizeRequest(req)) {
+		    	resp.status(403).send();
+		    	return;
+		    }
+
 		    var group = req.body;
 		    domain.addGroup(group);
 
@@ -120,6 +165,11 @@ module.exports = {
 
 			console.log('[SCIM] Update Group');
 		    logger.dumpRequest(req);
+
+		    if (!self.authorizeRequest(req)) {
+		    	resp.status(403).send();
+		    	return;
+		    }
 
 		    var members = req.body.members;
 
@@ -147,5 +197,21 @@ module.exports = {
 
 		    resp.send();
 		});
+    },
+
+    authorizeRequest: function(request) {
+
+    	if (this.authorizationBearerToken == null) {
+    		// Ignore authorization
+    		return true;
+    	}
+
+    	if (request.headers['authorization'] == undefined) {
+    		// Authorization token was expected but not sent by client
+    		return false;
+    	}
+
+    	var bearerToken = 'Bearer ' + this.authorizationBearerToken;
+    	return request.headers['authorization'] === bearerToken;
     }
 }

@@ -3,6 +3,7 @@ var requestTemplates = require('./request-templates');
 
 // System under test
 var scimServerEndpoint = 'http://192.168.1.112:3000/svc/scim';
+var authorizationBearer = 'alma';
 
 /* ***************************************************** */
 /* User handling                                         */
@@ -11,6 +12,7 @@ var scimServerEndpoint = 'http://192.168.1.112:3000/svc/scim';
 // Create user
 frisby.create('Ensure create user returns 201 Created')
   .post(scimServerEndpoint + '/users', requestTemplates.getCreateUserRequest(), { json: true })
+  .addHeader('Authorization', 'Bearer ' + authorizationBearer)
   .expectStatus(201)
   .after(function(err, res, body) {
 
@@ -19,6 +21,7 @@ frisby.create('Ensure create user returns 201 Created')
     // Get user
     frisby.create('Get newly created user')
       .get(scimServerEndpoint + '/users/' + createdUser.id)
+      .addHeader('Authorization', 'Bearer ' + authorizationBearer)
       .expectStatus(200)
       .afterJSON(function(json) {
         describe('Created user', function() {
@@ -34,6 +37,7 @@ frisby.create('Ensure create user returns 201 Created')
     createdUser.userName = 'modified@username.com';
     frisby.create('Update user')
       .put(scimServerEndpoint + '/users/' + createdUser.id, createdUser, { json: true })
+      .addHeader('Authorization', 'Bearer ' + authorizationBearer)
       .expectStatus(200)
       .afterJSON(function(json) {
         describe('Updated user', function() {
@@ -45,9 +49,13 @@ frisby.create('Ensure create user returns 201 Created')
     // Delete user
     frisby.create('Delete user')
       .delete(scimServerEndpoint + '/users/' + createdUser.id)
+      .addHeader('Authorization', 'Bearer ' + authorizationBearer)
       .expectStatus(200)
       .after(function(err, res, body) {
-        frisby.create('Get "deleted" user').get(scimServerEndpoint + '/users/' + createdUser.id).expectStatus(404).toss();
+        frisby.create('Get "deleted" user')
+          .get(scimServerEndpoint + '/users/' + createdUser.id)
+          .addHeader('Authorization', 'Bearer ' + authorizationBearer)
+          .expectStatus(404).toss();
       })
     .toss();
   })
@@ -60,6 +68,7 @@ frisby.create('Ensure create user returns 201 Created')
 // Create group
 frisby.create('Ensure create group returns 201 Created')
   .post(scimServerEndpoint + '/groups', requestTemplates.getCreateGroupRequest(), { json: true })
+  .addHeader('Authorization', 'Bearer ' + authorizationBearer)
   .expectStatus(201)
   .after(function(err, res, body) {
     var createdGroup = body;
@@ -67,6 +76,7 @@ frisby.create('Ensure create group returns 201 Created')
     // Get groups, newly created group should be there
     frisby.create('Get newly created group')
       .get(scimServerEndpoint + '/groups')
+      .addHeader('Authorization', 'Bearer ' + authorizationBearer)
       .expectStatus(200)
       .afterJSON(function(json) {
 
@@ -89,6 +99,7 @@ frisby.create('Ensure create group returns 201 Created')
     // Update group (adding member)
     frisby.create('Create user that can be added to group')
       .post(scimServerEndpoint + '/users', requestTemplates.getCreateUserRequest(), { json: true })
+      .addHeader('Authorization', 'Bearer ' + authorizationBearer)
       .expectStatus(201)
       .after(function(err, res, body) {
         var createdUser = body;
@@ -97,12 +108,14 @@ frisby.create('Ensure create group returns 201 Created')
         // Update group - Add member
         frisby.create('Update group (add member)')
           .patch(scimServerEndpoint + '/groups/' + createdGroup.id, patchGroupRequest, { json: true })
+          .addHeader('Authorization', 'Bearer ' + authorizationBearer)
           .expectStatus(200)
           .after(function(err, res, body) {
             
             // Validate that createdUser should be a member of the group by now
             frisby.create('Get updated group')
               .get(scimServerEndpoint + '/groups')
+              .addHeader('Authorization', 'Bearer ' + authorizationBearer)
               .expectStatus(200)
               .afterJSON(function(json) {
 
@@ -132,17 +145,18 @@ frisby.create('Ensure create group returns 201 Created')
                   it('has new member', function() { expect(memberFound).toBe(true); });
                 });
 
-
                 // Remove from group
                 patchGroupRequest = requestTemplates.getPatchGroupRequest(createdUser.id, true);
                 frisby.create('Update group (add member)')
                   .patch(scimServerEndpoint + '/groups/' + createdGroup.id, patchGroupRequest, { json: true })
+                  .addHeader('Authorization', 'Bearer ' + authorizationBearer)
                   .expectStatus(200)
                   .after(function(err, res, body) {
                     
                     // Validate that createdUser should not be a member of the group by now
                     frisby.create('Get updated group')
                       .get(scimServerEndpoint + '/groups')
+                      .addHeader('Authorization', 'Bearer ' + authorizationBearer)
                       .expectStatus(200)
                       .afterJSON(function(json) {
 
