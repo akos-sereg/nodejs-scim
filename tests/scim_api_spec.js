@@ -7,6 +7,51 @@ var serverConfig = require('./config');
 /* ***************************************************** */
 
 // Create user
+frisby.create('Active flag is considered when creating user (set to False, retrieve)')
+  .post(serverConfig.serverAddress + '/users', requestTemplates.getCreateUserRequest({ active: false }), { json: true })
+  .addHeader('Authorization', 'Bearer ' + serverConfig.authorizationBearer)
+  .expectStatus(201)
+  .after(function(err, res, body) {
+
+    var createdUser = body;
+
+    frisby.create('Get newly created user')
+      .get(serverConfig.serverAddress + '/users/' + createdUser.id)
+      .addHeader('Authorization', 'Bearer ' + serverConfig.authorizationBearer)
+      .expectStatus(200)
+      .afterJSON(function(json) {
+        describe('Created user', function() {
+          it('has correct active flag', function() { expect(json.active).toBe(false); });
+        });
+      })
+    .toss();
+
+  })
+.toss();
+
+frisby.create('Active flag is considered when creating user (set to True, retrieve)')
+  .post(serverConfig.serverAddress + '/users', requestTemplates.getCreateUserRequest({ active: true }), { json: true })
+  .addHeader('Authorization', 'Bearer ' + serverConfig.authorizationBearer)
+  .expectStatus(201)
+  .after(function(err, res, body) {
+
+    var createdUser = body;
+
+    frisby.create('Get newly created user')
+      .get(serverConfig.serverAddress + '/users/' + createdUser.id)
+      .addHeader('Authorization', 'Bearer ' + serverConfig.authorizationBearer)
+      .expectStatus(200)
+      .afterJSON(function(json) {
+        describe('Created user', function() {
+          it('has correct active flag', function() { expect(json.active).toBe(true); });
+        });
+      })
+    .toss();
+
+  })
+.toss();
+
+// Create - Get - Update - Delete
 frisby.create('Ensure create user returns 201 Created')
   .post(serverConfig.serverAddress + '/users', requestTemplates.getCreateUserRequest(), { json: true })
   .addHeader('Authorization', 'Bearer ' + serverConfig.authorizationBearer)

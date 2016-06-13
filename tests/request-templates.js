@@ -3,7 +3,12 @@
 // -----------------------------------------------------------------------------
 module.exports = {
 
-	getCreateUserRequest: function() {
+	getCreateUserRequest: function(settings) {
+
+		if (settings == undefined) {
+			settings = { active: true };
+		}
+
 		return {
 		   "schemas":[
 		      "urn:scim:schemas:core:1.0"
@@ -19,7 +24,7 @@ module.exports = {
 		   "profileUrl":"https://example.app.com/team/justin",
 		   "title":"Director of Sanging",
 		   "timezone":"Pacific Standard Time",
-		   "active":true,
+		   "active": settings.active,
 		   "emails":[
 		      {
 		         "value":"jbibinka2@example.com",

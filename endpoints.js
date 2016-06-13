@@ -41,7 +41,6 @@ module.exports = {
 		});
 
 		// Update User
-		// TODO: consider 'active' header value
 		app.put('/svc/scim/users/:id', function(req, resp) {
 
 		    domain.updateUser(req.params.id, req.body);
